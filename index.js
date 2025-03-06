@@ -1,3 +1,27 @@
+// Function to set the valid date range for the date picker
+function setDateRange() {
+    let today = new Date();
+    
+    // Calculate 18 years ago for the minimum age
+    let minDate = new Date(today);
+    minDate.setFullYear(today.getFullYear() - 55); // Maximum 55 years ago
+
+    // Calculate 55 years ago for the maximum age
+    let maxDate = new Date(today);
+    maxDate.setFullYear(today.getFullYear() - 18); // Minimum 18 years ago
+
+    // Format the dates in YYYY-MM-DD format
+    let minDateString = minDate.toISOString().split('T')[0];
+    let maxDateString = maxDate.toISOString().split('T')[0];
+
+    // Set the min and max attributes for the date input
+    document.getElementById('dob').setAttribute('min', minDateString);
+    document.getElementById('dob').setAttribute('max', maxDateString);
+}
+
+// Call the function to set date range when the page loads
+window.onload = setDateRange;
+
 document.getElementById('registrationForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -59,11 +83,6 @@ function clearTable() {
     // Clear data from localStorage
     localStorage.removeItem('registrations');
 }
-
-// Load data when the page loads
-window.onload = function() {
-    loadData();
-};
 
 // Add event listener for the Clear Table button
 document.getElementById('clearTableButton').addEventListener('click', function() {
