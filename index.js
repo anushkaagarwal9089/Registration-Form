@@ -2,11 +2,11 @@
 function setDateRange() {
     let today = new Date();
     
-    // Calculate 18 years ago for the minimum age
+    // Calculate 55 years ago for the maximum age
     let minDate = new Date(today);
     minDate.setFullYear(today.getFullYear() - 55); // Maximum 55 years ago
 
-    // Calculate 55 years ago for the maximum age
+    // Calculate 18 years ago for the minimum age
     let maxDate = new Date(today);
     maxDate.setFullYear(today.getFullYear() - 18); // Minimum 18 years ago
 
@@ -17,10 +17,32 @@ function setDateRange() {
     // Set the min and max attributes for the date input
     document.getElementById('dob').setAttribute('min', minDateString);
     document.getElementById('dob').setAttribute('max', maxDateString);
+
+    // Set the default date for the date picker to the date when the user is 18
+    let defaultDate = new Date(today);
+    defaultDate.setFullYear(today.getFullYear() - 18); // Default to 18 years ago
+    document.getElementById('dob').value = defaultDate.toISOString().split('T')[0]; // Set the default date to 18 years old
 }
 
-// Call the function to set date range when the page loads
-window.onload = setDateRange;
+// Function to prevent manual input for the date field
+function preventManualInput() {
+    const dobInput = document.getElementById('dob');
+    
+    // Clear the input field if it is manually typed
+    dobInput.addEventListener('input', function(event) {
+        const value = event.target.value;
+        // Check if the value is not in the correct format (YYYY-MM-DD)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            event.target.value = ''; // Clear the input field if it's manually typed
+        }
+    });
+}
+
+// Call the function to set the date range and prevent manual input when the page loads
+window.onload = function() {
+    setDateRange();
+    preventManualInput();
+};
 
 document.getElementById('registrationForm').addEventListener('submit', function(event) {
     event.preventDefault();
