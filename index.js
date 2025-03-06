@@ -17,6 +17,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         age--;
     }
 
+    // If the user is not between 18 and 55 years old, show an alert
     if (age < 18 || age > 55) {
         alert("You must be between 18 and 55 years old.");
         return;
@@ -48,7 +49,22 @@ function loadData() {
     });
 }
 
+// Function to clear the table and localStorage
+function clearTable() {
+    // Clear the table in the DOM
+    let table = document.getElementById('registrationTable').getElementsByTagName('tbody')[0];
+    table.innerHTML = '';
+
+    // Clear the data from localStorage
+    localStorage.removeItem('registrations');
+}
+
 // Load data when the page is loaded
 window.onload = function() {
     loadData();
 };
+
+// Add event listener for the Clear Table button
+document.getElementById('clearTableButton').addEventListener('click', function() {
+    clearTable();
+});
