@@ -1,41 +1,40 @@
 document.getElementById('registrationForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    // Get values from the form
+    // Get form data
     let name = document.getElementById('name').value;
     let email = document.getElementById('email').value;
     let password = document.getElementById('password').value;
     let dob = document.getElementById('dob').value;
     let acceptedTerms = document.getElementById('acceptedTerms').checked;
 
-    // Validate the age (between 18 and 55 years old)
+    // Validate age (18-55 years old)
     let today = new Date();
     let birthDate = new Date(dob);
     let age = today.getFullYear() - birthDate.getFullYear();
     let m = today.getMonth() - birthDate.getMonth();
-
-    // If birthdate hasn't occurred yet this year, subtract one from age
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
     }
 
-    // If the user is not between 18 and 55 years old, show an alert
+    // If age is not between 18 and 55, show an alert and exit
     if (age < 18 || age > 55) {
         alert("You must be between 18 and 55 years old.");
         return;
     }
 
-    // Save the data to localStorage
+    // Save form data to localStorage
     let registrationData = { name, email, password, dob, acceptedTerms };
     let existingData = JSON.parse(localStorage.getItem('registrations')) || [];
     existingData.push(registrationData);
     localStorage.setItem('registrations', JSON.stringify(existingData));
 
+    // Reload table with the new data
     alert("Registration successful!");
-    loadData(); // Reload the data in the table
+    loadData();
 });
 
-// Function to load data from localStorage and display it in a table
+// Function to load data from localStorage and display it in the table
 function loadData() {
     let table = document.getElementById('registrationTable').getElementsByTagName('tbody')[0];
     table.innerHTML = ''; // Clear existing table rows
@@ -57,11 +56,11 @@ function clearTable() {
     let table = document.getElementById('registrationTable').getElementsByTagName('tbody')[0];
     table.innerHTML = '';
 
-    // Clear the data from localStorage
+    // Clear data from localStorage
     localStorage.removeItem('registrations');
 }
 
-// Load data when the page is loaded
+// Load data when the page loads
 window.onload = function() {
     loadData();
 };
