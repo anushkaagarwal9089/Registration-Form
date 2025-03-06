@@ -1,112 +1,125 @@
-// Function to set the valid date range for the date picker
-function setDateRange() {
-    let today = new Date();
-    
-    // Calculate 55 years ago for the maximum age
-    let minDate = new Date(today);
-    minDate.setFullYear(today.getFullYear() - 55); // Maximum 55 years ago
-
-    // Calculate 18 years ago for the minimum age
-    let maxDate = new Date(today);
-    maxDate.setFullYear(today.getFullYear() - 18); // Minimum 18 years ago
-
-    // Format the dates in YYYY-MM-DD format
-    let minDateString = minDate.toISOString().split('T')[0];
-    let maxDateString = maxDate.toISOString().split('T')[0];
-
-    // Set the min and max attributes for the date input
-    document.getElementById('dob').setAttribute('min', minDateString);
-    document.getElementById('dob').setAttribute('max', maxDateString);
-
-    // Set the default date for the date picker to the date when the user is 18
-    let defaultDate = new Date(today);
-    defaultDate.setFullYear(today.getFullYear() - 18); // Default to 18 years ago
-    document.getElementById('dob').value = defaultDate.toISOString().split('T')[0]; // Set the default date to 18 years old
-}
-
-// Function to prevent manual input for the date field
-function preventManualInput() {
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const userTableBody = document.getElementById('userTable').querySelector('tbody');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
     const dobInput = document.getElementById('dob');
-    
-    // Clear the input field if it is manually typed
-    dobInput.addEventListener('input', function(event) {
-        const value = event.target.value;
-        // Check if the value is not in the correct format (YYYY-MM-DD)
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-            event.target.value = ''; // Clear the input field if it's manually typed
-        }
+    const acceptedTermsInput = document.getElementById('acceptedTerms');
+
+    // Calculate min and max dates for the date picker
+    const today = new Date();
+    let maxDate = new Date(today);
+    maxDate.setFullYear(today.getFullYear() - 18); // 18 years ago
+
+    let minDate = new Date(today);
+    minDate.setFullYear(today.getFullYear() - 55); // 55 years ago
+
+    // Format the min and max dates for the input[type="date"]
+    const formatDate = (date) => {
+        let year = date.getFullYear();
+        let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        let day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    dobInput.setAttribute('max', formatDate(maxDate));
+    dobInput.setAttribute('min', formatDate(minDate));
+
+    // Attempt to completely disable typing (more robust)
+    dobInput.addEventListener('keydown', function(event) {
+        event.preventDefault(); // Prevent any key presses from entering the field
     });
-}
 
-// Call the function to set the date range and prevent manual input when the page loads
-window.onload = function() {
-    setDateRange();
-    preventManualInput();
-};
+    dobInput.addEventListener('paste', function(event) {
+        event.preventDefault();  // Prevent pasting
+    });
 
-document.getElementById('registrationForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+    dobInput.addEventListener('contextmenu', function(event) {
+        event.preventDefault(); // Prevent right-click context menu
+    });
 
-    // Get form data
-    let name = document.getElementById('name').value;
-    let email = document.getElementById('email').value;
-    let password = document.getElementById('password').value;
-    let dob = document.getElementById('dob').value;
-    let acceptedTerms = document.getElementById('acceptedTerms').checked;
 
-    // Validate age (18-55 years old)
-    let today = new Date();
-    let birthDate = new Date(dob);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    let m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-
-    // If age is not between 18 and 55, show an alert and exit
-    if (age < 18 || age > 55) {
-        alert("You must be between 18 and 55 years old.");
-        return;
-    }
-
-    // Save form data to localStorage
-    let registrationData = { name, email, password, dob, acceptedTerms };
-    let existingData = JSON.parse(localStorage.getItem('registrations')) || [];
-    existingData.push(registrationData);
-    localStorage.setItem('registrations', JSON.stringify(existingData));
-
-    // Reload table with the new data
-    alert("Registration successful!");
+    // Load saved data from local storage
     loadData();
-});
 
-// Function to load data from localStorage and display it in the table
-function loadData() {
-    let table = document.getElementById('registrationTable').getElementsByTagName('tbody')[0];
-    table.innerHTML = ''; // Clear existing table rows
 
-    let registrations = JSON.parse(localStorage.getItem('registrations')) || [];
-    registrations.forEach(function(data) {
-        let row = table.insertRow();
-        row.insertCell(0).innerText = data.name;
-        row.insertCell(1).innerText = data.email;
-        row.insertCell(2).innerText = data.password;
-        row.insertCell(3).innerText = data.dob;
-        row.insertCell(4).innerText = data.acceptedTerms ? 'true' : 'false';
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        if (!validateAge(dobInput.value)) {
+            alert("Age must be between 18 and 55.");
+            return;
+        }
+
+        const name = nameInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        const dob = dobInput.value;
+        const acceptedTerms = acceptedTermsInput.checked;
+
+        // Create a new row in the table
+        const newRow = userTableBody.insertRow();
+        const nameCell = newRow.insertCell();
+        const emailCell = newRow.insertCell();
+        const passwordCell = newRow.insertCell();
+        const dobCell = newRow.insertCell();
+        const acceptedTermsCell = newRow.insertCell();
+
+        nameCell.textContent = name;
+        emailCell.textContent = email;
+        passwordCell.textContent = password;
+        dobCell.textContent = dob;
+        acceptedTermsCell.textContent = acceptedTerms;
+
+        // Save data to local storage
+        saveData(name, email, password, dob, acceptedTerms);
+
+        // Clear the form fields
+        nameInput.value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+        dobInput.value = '';
+        acceptedTermsInput.checked = false;
     });
-}
 
-// Function to clear the table and localStorage
-function clearTable() {
-    // Clear the table in the DOM
-    let table = document.getElementById('registrationTable').getElementsByTagName('tbody')[0];
-    table.innerHTML = '';
 
-    // Clear data from localStorage
-    localStorage.removeItem('registrations');
-}
+    function validateAge(dateString) {
+        const today = new Date();
+        const birthDate = new Date(dateString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const month = today.getMonth() - birthDate.getMonth();
 
-// Add event listener for the Clear Table button
-document.getElementById('clearTableButton').addEventListener('click', function() {
-    clearTable();
+        if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        return age >= 18 && age <= 55;
+    }
+
+
+    function saveData(name, email, password, dob, acceptedTerms) {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users.push({ name, email, password, dob, acceptedTerms });
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+
+
+    function loadData() {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users.forEach(user => {
+            const newRow = userTableBody.insertRow();
+            const nameCell = newRow.insertCell();
+            const emailCell = newRow.insertCell();
+            const passwordCell = newRow.insertCell();
+            const dobCell = newRow.insertCell();
+            const acceptedTermsCell = newRow.insertCell();
+
+            nameCell.textContent = user.name;
+            emailCell.textContent = user.email;
+            passwordCell.textContent = user.password;
+            dobCell.textContent = user.dob;
+            acceptedTermsCell.textContent = user.acceptedTerms;
+        });
+    }
 });
