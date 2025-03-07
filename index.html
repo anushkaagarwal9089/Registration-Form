@@ -4,32 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Form</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+    </style>
 </head>
 <body>
     <h2>Registration Form</h2>
     <form id="registrationForm">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br>
+        <input type="text" id="name" required><br><br>
 
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+        <input type="email" id="email" required><br><br>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
+        <input type="password" id="password" required><br><br>
 
         <label for="dob">Date of Birth:</label>
-        <input type="date" id="dob" name="dob" required><br>
+        <input type="date" id="dob" required><br><br>
 
-        <label for="acceptedTerms">
-            <input type="checkbox" id="acceptedTerms" name="acceptedTerms"> I accept the terms and conditions
-        </label><br>
+        <label>
+            <input type="checkbox" id="terms"> Accept Terms and Conditions
+        </label><br><br>
 
         <button type="submit">Submit</button>
     </form>
 
     <h2>Registered Users</h2>
-    <table id="userTable">
+    <table>
         <thead>
             <tr>
                 <th>Name</th>
@@ -39,8 +44,7 @@
                 <th>Accepted terms?</th>
             </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody id="userTable"></tbody>
     </table>
 
     <script src="index.js"></script>
