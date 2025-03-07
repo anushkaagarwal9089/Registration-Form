@@ -1,62 +1,68 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("registrationForm");
-    const userTable = document.getElementById("userTable");
-    const dobInput = document.getElementById("dob");
+// script.js
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const dobInput = document.getElementById('dob');
+    const acceptTermsCheckbox = document.getElementById('acceptTerms');
+    const submitButton = document.getElementById('submitButton');
+    const userTableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
 
-    // Set date constraints (18 to 55 years range)
-    const today = new Date();
-    const minDate = new Date();
-    const maxDate = new Date();
+    // Load saved users
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    displayUsers();
 
-    minDate.setFullYear(today.getFullYear() - 55);
-    maxDate.setFullYear(today.getFullYear() - 18);
+    // Date validation
+    dobInput.addEventListener('change', function() {
+        const selectedDate = new Date(this.value);
+        const currentDate = new Date();
+        const minAgeDate = new Date(currentDate);
+        minAgeDate.setFullYear(minAgeDate.getFullYear() - 55);
+        const maxAgeDate = new Date(currentDate);
+        maxAgeDate.setFullYear(maxAgeDate.getFullYear() - 18);
 
-    dobInput.setAttribute("min", minDate.toISOString().split("T")[0]);
-    dobInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
-
-    // Disable editing after selecting the date
-    dobInput.addEventListener("change", function () {
-        dobInput.setAttribute("readonly", true);
+        if (selectedDate < minAgeDate || selectedDate > maxAgeDate) {
+            alert("Date of birth must be between 18 and 55 years ago.");
+            this.value = '';
+        } else {
+            this.setAttribute('readonly', 'true');
+        }
     });
 
-    // Load stored data
-    function loadUsers() {
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        userTable.innerHTML = "";
+    // Submit button event listener
+    submitButton.addEventListener('click', function() {
+        const name = nameInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        const dob = dobInput.value;
+        const acceptTerms = acceptTermsCheckbox.checked;
+
+        const newUser = { name, email, password, dob, acceptTerms };
+        users.push(newUser);
+
+        localStorage.setItem('users', JSON.stringify(users));
+        displayUsers();
+        resetForm();
+    });
+
+    function displayUsers() {
+        userTableBody.innerHTML = '';
         users.forEach(user => {
-            const row = userTable.insertRow();
-            row.innerHTML = `
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.password}</td>
-                <td>${user.dob}</td>
-                <td>${user.terms}</td>
-            `;
+            const row = userTableBody.insertRow();
+            row.insertCell().textContent = user.name;
+            row.insertCell().textContent = user.email;
+            row.insertCell().textContent = user.password;
+            row.insertCell().textContent = user.dob;
+            row.insertCell().textContent = user.acceptTerms;
         });
     }
 
-    // Save new user
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const dob = document.getElementById("dob").value;
-        const terms = document.getElementById("terms").checked;
-
-        if (!dob) {
-            alert("Please select a valid date of birth.");
-            return;
-        }
-
-        const newUser = { name, email, password, dob, terms };
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        users.push(newUser);
-        localStorage.setItem("users", JSON.stringify(users));
-
-        loadUsers();
-        form.reset();
-    });
-
-    loadUsers();
+    function resetForm() {
+        nameInput.value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+        dobInput.value = '';
+        dobInput.removeAttribute('readonly');
+        acceptTermsCheckbox.checked = false;
+    }
 });
