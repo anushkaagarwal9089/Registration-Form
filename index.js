@@ -3,21 +3,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const userTable = document.getElementById("userTable");
     const dobInput = document.getElementById("dob");
 
-    // Set min and max date for 18-55 years age range (excluding today)
+    // Set min and max date for 18-55 years (including today)
     const today = new Date();
     const minDate = new Date();
     const maxDate = new Date();
 
-    minDate.setFullYear(today.getFullYear() - 55); // Oldest allowed
-    maxDate.setFullYear(today.getFullYear() - 18); // Youngest allowed
-
-    minDate.setDate(minDate.getDate() + 1); // Exclude today
-    maxDate.setDate(maxDate.getDate() - 1); // Exclude today
+    minDate.setFullYear(today.getFullYear() - 55); // 55 years ago (includes today)
+    maxDate.setFullYear(today.getFullYear() - 18); // 18 years ago (includes today)
 
     dobInput.setAttribute("min", minDate.toISOString().split("T")[0]);
     dobInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
 
-    // Prevent editing DOB after selection
+    // Prevent modification after selection
     dobInput.addEventListener("change", function () {
         if (dobInput.value) {
             dobInput.setAttribute("readonly", true);
