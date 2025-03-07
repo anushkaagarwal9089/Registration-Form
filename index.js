@@ -1,69 +1,63 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("registrationForm");
-    const userTable = document.getElementById("userTable");
-    const dobInput = document.getElementById("dob");
+document.getElementById('registrationForm').addEventListener('submit', function (event) {
+    event.preventDefault();
 
-    // Set min and max date for 18-55 years (including today)
-    const today = new Date();
-    const minDate = new Date();
-    const maxDate = new Date();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const dob = document.getElementById('dob').value;
+    const terms = document.getElementById('terms').checked;
 
-    minDate.setFullYear(today.getFullYear() - 55); // 55 years ago (includes today)
-    maxDate.setFullYear(today.getFullYear() - 18); // 18 years ago (includes today)
-
-    dobInput.setAttribute("min", minDate.toISOString().split("T")[0]);
-    dobInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
-
-    // Prevent modification after selecting DOB
-    dobInput.addEventListener("change", function () {
-        if (dobInput.value) {
-            dobInput.addEventListener("keydown", preventTyping);
-            dobInput.addEventListener("paste", preventTyping);
-        }
-    });
-
-    function preventTyping(event) {
-        event.preventDefault();
+    const age = calculateAge(new Date(dob));
+    if (age < 18 || age > 55) {
+        alert('Date of Birth must be for people between ages 18 and 55 only.');
+        return;
     }
 
-    // Load stored users
-    function loadUsers() {
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        userTable.innerHTML = "";
-        users.forEach(user => {
-            const row = userTable.insertRow();
-            row.innerHTML = `
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>${user.password}</td>
-                <td>${user.dob}</td>
-                <td>${user.terms}</td>
-            `;
-        });
-    }
+    const user = {
+        name,
+        email,
+        password,
+        dob,
+        terms
+    };
 
-    // Save new user
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const dob = document.getElementById("dob").value;
-        const terms = document.getElementById("terms").checked;
+    // Save user data to web storage
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    users.push(user);
+    localStorage.setItem('users', JSON.stringify(users));
 
-        if (!dob) {
-            alert("Please select a valid date of birth.");
-            return;
-        }
+    // Add user to table
+    addUserToTable(user);
 
-        const newUser = { name, email, password, dob, terms };
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        users.push(newUser);
-        localStorage.setItem("users", JSON.stringify(users));
+    // Clear the form
+    document.getElementById('registrationForm').reset();
+});
 
-        loadUsers();
-        form.reset();
-    });
+function calculateAge(dob) {
+    const diff = Date.now() - dob.getTime();
+    const ageDt = new Date(diff); 
+    return Math.abs(ageDt.getUTCFullYear() - 1970);
+}
 
-    loadUsers();
+function addUserToTable(user) {
+    const table = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+
+    const nameCell = newRow.insertCell(0);
+    const emailCell = newRow.insertCell(1);
+    const passwordCell = newRow.insertCell(2);
+    const dobCell = newRow.insertCell(3);
+    const termsCell = newRow.insertCell(4);
+
+    nameCell.textContent = user.name;
+    emailCell.textContent = user.email;
+    passwordCell.textContent = user.password;
+    dobCell.textContent = user.dob;
+    termsCell.textContent = user.terms ? 'true' : 'false';
+}
+
+// Load saved users from web storage
+document.addEventListener('DOMContentLoaded', function () {
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    users.forEach(user => addUserToTable(user));
 });
