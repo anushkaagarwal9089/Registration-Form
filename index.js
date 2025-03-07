@@ -22,6 +22,12 @@ document.getElementById('registrationForm').addEventListener('submit', function 
     const dob = document.getElementById('dob').value;
     const terms = document.getElementById('terms').checked;
 
+    // Validate email format
+    if (!validateEmail(email)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+
     const age = calculateAge(new Date(dob));
     if (age < 18 || age > 55) {
         alert('Date of Birth must be for people between ages 18 and 55 only.');
@@ -47,6 +53,11 @@ document.getElementById('registrationForm').addEventListener('submit', function 
     // Clear the form
     document.getElementById('registrationForm').reset();
 });
+
+function validateEmail(email) {
+    const re = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+    return re.test(String(email).toLowerCase());
+}
 
 function calculateAge(dob) {
     const diff = Date.now() - dob.getTime();
