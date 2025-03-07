@@ -1,3 +1,18 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const dobInput = document.getElementById('dob');
+
+    // Set the minimum and maximum date for the date input
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - 55, today.getMonth(), today.getDate());
+    const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
+    dobInput.min = minDate.toISOString().split('T')[0];
+    dobInput.max = maxDate.toISOString().split('T')[0];
+
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    users.forEach(user => addUserToTable(user));
+});
+
 document.getElementById('registrationForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -55,9 +70,3 @@ function addUserToTable(user) {
     dobCell.textContent = user.dob;
     termsCell.textContent = user.terms ? 'true' : 'false';
 }
-
-// Load saved users from web storage
-document.addEventListener('DOMContentLoaded', function () {
-    let users = JSON.parse(localStorage.getItem('users')) || [];
-    users.forEach(user => addUserToTable(user));
-});
