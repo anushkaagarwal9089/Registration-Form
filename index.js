@@ -14,12 +14,17 @@ document.addEventListener("DOMContentLoaded", function () {
     dobInput.setAttribute("min", minDate.toISOString().split("T")[0]);
     dobInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
 
-    // Prevent modification after selection
+    // Prevent modification after selecting DOB
     dobInput.addEventListener("change", function () {
         if (dobInput.value) {
-            dobInput.setAttribute("readonly", true);
+            dobInput.addEventListener("keydown", preventTyping);
+            dobInput.addEventListener("paste", preventTyping);
         }
     });
+
+    function preventTyping(event) {
+        event.preventDefault();
+    }
 
     // Load stored users
     function loadUsers() {
