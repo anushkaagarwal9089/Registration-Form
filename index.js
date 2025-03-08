@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const dobInput = document.getElementById('dob');
     const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
 
     // Set the minimum and maximum date for the date input
     const today = new Date();
@@ -13,14 +14,19 @@ document.addEventListener('DOMContentLoaded', function () {
     let users = JSON.parse(localStorage.getItem('users')) || [];
     users.forEach(user => addUserToTable(user));
 
+    // Disable the password field initially
+    passwordInput.disabled = true;
+
     // Add email input event listener for real-time validation
     emailInput.addEventListener('input', function () {
         const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
         if (!emailPattern.test(emailInput.value)) {
             emailInput.setCustomValidity('Please enter a valid email address.');
             emailInput.reportValidity();
+            passwordInput.disabled = true;
         } else {
             emailInput.setCustomValidity('');
+            passwordInput.disabled = false;
         }
     });
 });
@@ -58,6 +64,9 @@ document.getElementById('registrationForm').addEventListener('submit', function 
 
     // Clear the form
     document.getElementById('registrationForm').reset();
+
+    // Disable password field after form reset
+    document.getElementById('password').disabled = true;
 });
 
 function calculateAge(dob) {
