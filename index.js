@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const dobInput = document.getElementById('dob');
+    const emailInput = document.getElementById('email');
 
     // Set the minimum and maximum date for the date input
     const today = new Date();
@@ -11,6 +12,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let users = JSON.parse(localStorage.getItem('users')) || [];
     users.forEach(user => addUserToTable(user));
+
+    // Add email input event listener for real-time validation
+    emailInput.addEventListener('input', function () {
+        const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+        if (!emailPattern.test(emailInput.value)) {
+            emailInput.setCustomValidity('Please enter a valid email address.');
+            emailInput.reportValidity();
+        } else {
+            emailInput.setCustomValidity('');
+        }
+    });
 });
 
 document.getElementById('registrationForm').addEventListener('submit', function (event) {
@@ -21,13 +33,6 @@ document.getElementById('registrationForm').addEventListener('submit', function 
     const password = document.getElementById('password').value;
     const dob = document.getElementById('dob').value;
     const terms = document.getElementById('terms').checked;
-
-    // Validate email format
-    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-    if (!emailPattern.test(email)) {
-        alert('Please enter a valid email address.');
-        return;
-    }
 
     const age = calculateAge(new Date(dob));
     if (age < 18 || age > 55) {
@@ -54,11 +59,6 @@ document.getElementById('registrationForm').addEventListener('submit', function 
     // Clear the form
     document.getElementById('registrationForm').reset();
 });
-
-function validateEmail(email) {
-    const re = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-    return re.test(String(email).toLowerCase());
-}
 
 function calculateAge(dob) {
     const diff = Date.now() - dob.getTime();
